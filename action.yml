@@ -1,5 +1,6 @@
 name: Publish or Update AWS Lambda Layer for python
 description: This action will create version or publish an AWS Lambda Layer from GitHub Workflow.
+author: Umer Mughal
 
 
 branding:
