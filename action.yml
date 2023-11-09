@@ -4,26 +4,26 @@ description: This action will create version or publish an AWS Lambda Layer from
 
 branding:
   icon: layers
-  color: red
+  color: green
 
 inputs:
   python_version:
-    description: Python Version, default is '3.7'
+    description: Python Version, default value is '3.7'
     default: '3.7'
   layer_name:
-    description: Name for the Lambda Layer
+    description: Name of AWS Lambda Layer
     required: true
   layer_directory:
-    description: Working directory in repository where requirements file exists
-    required: true
-  aws_account_id:
-    description: An AWS Account ID to grant layer usage permissions to. (Use "*" to share with all accounts)
+    description: Working directory in repository where "requirements.txt" file exists
     required: true
   bucket_name:
-    description: AWS S3 Bucket Name where layer will be uploaded
+    description: S3 bucket name where lambda layer will be uploaded
     required: true
   bucket_path:
     description: An optional prefix that will be used for a folder path inside the S3 bucket
+  aws_account_id:
+    description: An AWS Account ID to grant layer usage permissions to. (Use "*" to share with all accounts)
+    required: true
 
 runs:
   using: 'composite'
@@ -33,7 +33,7 @@ runs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python_version }}
-        cache: 'pip' # caching pip dependencies
+        cache: 'pip'
 
     - name: Install boto3
       shell: bash
