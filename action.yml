@@ -49,12 +49,11 @@ runs:
 
     - name: Upload Zip and Create Layer
       shell: bash
-      id: build-layer
+      id: publish-layer
       working-directory: ${{ inputs.layer_directory }}
       run: |
-        DATE=$(date +"%d_%m_%Y")
         FOLDER_PATH="${{ inputs.bucket_path }}"
-        FORMATTED_LAYER_NAME="${{ inputs.layer_name }}-${DATE}"
+        FORMATTED_LAYER_NAME="${{ inputs.layer_name }}-${{ inputs.python_version }}"
         FORMATTED_ZIP="${FORMATTED_LAYER_NAME}.zip"
         
         echo "Upload Lambda Layer on S3 🚀"
@@ -70,8 +69,8 @@ runs:
     - name: Add Lambda Layer Permission
       shell: bash
       run: |
-        aws lambda add-layer-version-permission --layer_name ${{ steps.build-layer.outputs.layer_name }} \
-        --version-number ${{ steps.build-layer.outputs.layer_version }} \
+        aws lambda add-layer-version-permission --layer_name ${{ steps.publish-layer.outputs.layer_name }} \
+        --version-number ${{ steps.publish-layer.outputs.layer_version }} \
         --principal ${{ inputs.aws_account_id }} \
         --statement-id "GrantAccountAccess-${RANDOM}" \
         --action lambda:GetLayerVersion
