@@ -3,7 +3,7 @@
 - [Objective](#objective)
 - [Usage](#usage)
     - [Inputs](#inputs)
-    - [Examples](#examples)
+    - [Example](#example)
 - [Published Layer Name](#published-layer-name)
 
 ## Objective
@@ -46,9 +46,44 @@ The `layer-directory` is the folder path in git repository where `requirements.t
 
 The `bucket_name` parameter is the name of S3 bucket in which you want to upload the lambda layer.
 
-The `bucket_path` parameter is the folder path for lambda layer in S3 bucket.
+The `bucket_path` parameter is the folder path for lambda layer in S3 bucket. Use the format `lambda-layers/` to add S3
+path
 
-The `aws_account_id` parameter is an AWS account number with which you want to share the lambda layer. To share it with all accounts, use "*".
+The `aws_account_id` parameter is an AWS account number with which you want to share the lambda layer. To share it with
+all accounts, use "*".
+
+### Example
+
+```yaml
+name: publish-lambda-layer
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Publish Lambda layer
+        uses: UmerMuxhal/python-lambda-layer@0.1
+        with:
+          python_version: 3.7
+          layer_name: "my-lambda-layer"
+          layer_directory: "requirement"
+          bucket_name: "my-s3-bucket"
+          bucket_path: "layers/"
+          aws_account_id: "*"
+```
 
 ## Published Layer Name
 
