@@ -47,7 +47,7 @@ The `layer-directory` is the folder path in git repository where `requirements.t
 The `bucket_name` parameter is the name of S3 bucket in which you want to upload the lambda layer.
 
 The `bucket_path` parameter is the folder path for lambda layer in S3 bucket. Use the format `lambda-layers/` to add S3
-path
+path.
 
 The `aws_account_id` parameter is an AWS account number with which you want to share the lambda layer. To share it with
 all accounts, use "*".
