@@ -10,13 +10,13 @@ branding:
 inputs:
   python_version:
     description: Python Version, default value is '3.7'
-    default: '3.7'
+    default: "3.7"
   layer_name:
     description: Name of AWS Lambda Layer
     required: true
   layer_directory:
     description: Working directory in repository where "requirements.txt" file exists
-    required: true
+    default: "./"
   bucket_name:
     description: S3 bucket name where lambda layer will be uploaded
     required: true
