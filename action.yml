@@ -22,6 +22,7 @@ inputs:
     required: true
   bucket_path:
     description: An optional prefix that will be used for a folder path inside the S3 bucket
+    default: ""
   aws_account_id:
     description: An AWS Account ID to grant layer usage permissions to. (Use "*" to share with all accounts)
     default: "*"
@@ -58,12 +59,12 @@ runs:
         FORMATTED_ZIP="${FORMATTED_LAYER_NAME}.zip"
         
         echo "Upload Lambda Layer on S3 🚀"
-        aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}/${FORMATTED_ZIP}
+        aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${FORMATTED_ZIP}
         
         RESPONSE=$(aws lambda publish-layer-version --layer_name ${FORMATTED_LAYER_NAME} \
         --compatible-runtimes ${RUNTIME} \
         --description "${{ inputs.layer_name }} Layer" \
-        --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}/${FORMATTED_ZIP})
+        --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}${FORMATTED_ZIP})
 
         echo "::set-output name=layer_version::$(echo $RESPONSE | jq -r '.Version')"
         echo "::set-output name=layer_arn::$(echo $RESPONSE | jq -r '.LayerArn')"
