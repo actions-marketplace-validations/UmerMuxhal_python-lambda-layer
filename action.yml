@@ -30,15 +30,23 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Checkout Branch
+      uses: actions/checkout@v3
+
     - name: Setup Python Version
       uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python_version }}
         cache: 'pip'
 
-    - name: Install boto3
+    - name: Upgrade AWS CLI and Install boto3
       shell: bash
-      run: pip3 install boto3
+      run: |
+        pip3 install boto3
+        sudo apt-get remove awscli
+        sudo pip3 install -U awscli
+        source ~/.bashrc
+        aws --version
 
     - name: Install Python Requirements
       shell: bash
@@ -61,7 +69,8 @@ runs:
         echo "Upload Lambda Layer on S3 🚀"
         aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${FORMATTED_ZIP}
         
-        RESPONSE=$(aws lambda publish-layer-version --layer-name ${FORMATTED_LAYER_NAME} \
+        RESPONSE=$(aws lambda publish-layer-version \
+        --layer-name ${FORMATTED_LAYER_NAME} \
         --compatible-runtimes ${RUNTIME} \
         --description "${{ inputs.layer_name }} Layer" \
         --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}${FORMATTED_ZIP})
