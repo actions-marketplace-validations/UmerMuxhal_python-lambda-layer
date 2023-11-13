@@ -24,7 +24,7 @@ inputs:
     description: An optional prefix that will be used for a folder path inside the S3 bucket
   aws_account_id:
     description: An AWS Account ID to grant layer usage permissions to. (Use "*" to share with all accounts)
-    required: true
+    default: "*"
 
 runs:
   using: 'composite'
