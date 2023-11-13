@@ -61,7 +61,7 @@ runs:
         echo "Upload Lambda Layer on S3 🚀"
         aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${FORMATTED_ZIP}
         
-        RESPONSE=$(aws lambda publish-layer-version --layer_name ${FORMATTED_LAYER_NAME} \
+        RESPONSE=$(aws lambda publish-layer-version --layer-name ${FORMATTED_LAYER_NAME} \
         --compatible-runtimes ${RUNTIME} \
         --description "${{ inputs.layer_name }} Layer" \
         --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}${FORMATTED_ZIP})
