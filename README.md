@@ -32,7 +32,7 @@ Usage of this action requires following parameters.
 |-------------------|--------|----------|--------------------------------------------------------------------------------------------------------|
 | `python_version`  | string | No       | Python Version, default value is `3.7`                                                                 |
 | `layer_name`      | string | Yes      | Name of AWS Lambda Layer                                                                               |
-| `layer_directory` | string | Yes      | Working directory in repository where `requirements.txt` file exists                                   |
+| `layer_directory` | string | No       | Path of `requirements.txt` file in repository.                                                         |
 | `bucket_name`     | string | Yes      | S3 bucket name where lambda layer will be uploaded                                                     |
 | `bucket_path`     | string | No       | Folder path inside the S3 bucket (Optional)                                                            |
 | `aws_account_id`  | string | No       | An AWS Account ID to grant layer usage permissions to, default value is `*` to share with all acoounts |
@@ -40,9 +40,9 @@ Usage of this action requires following parameters.
 The `python_version` only accepts versions of python mentioned in AWS Lambda
 docs; [Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html).
 
-The `layer-name` can be anything you prefer. This is restricted to letters, numbers, hyphens, and underscores.
+The `layer_name` can be anything you prefer. This is restricted to letters, numbers, hyphens, and underscores.
 
-The `layer-directory` is the folder path in git repository where `requirements.txt` file exists.
+The `layer_directory` is the folder path in git repository where `requirements.txt` file exists. It is optional in case `requirements.txt` file is in root of repository.
 
 The `bucket_name` parameter is the name of S3 bucket in which you want to upload the lambda layer.
 
@@ -65,7 +65,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Branch
+        uses: actions/checkout@v3
+        run: git checkout ${{ env.BRANCH }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -75,7 +77,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Publish Lambda layer
-        uses: UmerMuxhal/python-lambda-layer@0.1
+        uses: UmerMuxhal/python-lambda-layer@v0.2
         with:
           python_version: 3.7
           layer_name: "my-lambda-layer"
