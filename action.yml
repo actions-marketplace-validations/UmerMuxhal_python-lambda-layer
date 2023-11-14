@@ -39,15 +39,6 @@ runs:
         python-version: ${{ inputs.python_version }}
         cache: 'pip'
 
-    - name: Upgrade AWS CLI and Install boto3
-      shell: bash
-      run: |
-        pip3 install boto3
-        sudo apt-get remove awscli
-        sudo pip3 install -U awscli
-        source ~/.bashrc
-        aws --version
-
     - name: Install Python Requirements
       shell: bash
       working-directory: ${{ inputs.layer_directory }}
@@ -61,6 +52,7 @@ runs:
       id: publish-layer
       working-directory: ${{ inputs.layer_directory }}
       run: |
+        echo "$PWD"
         RUNTIME="python${{ inputs.python_version }}"
         FOLDER_PATH="${{ inputs.bucket_path }}"
         FORMATTED_LAYER_NAME="${{ inputs.layer_name }}-${{ inputs.python_version }}"
