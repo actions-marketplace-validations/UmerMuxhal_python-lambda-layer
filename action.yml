@@ -52,17 +52,17 @@ runs:
       id: publish-layer
       working-directory: ${{ inputs.layer_directory }}
       run: |
-        echo "$PWD"
         RUNTIME="python${{ inputs.python_version }}"
         FOLDER_PATH="${{ inputs.bucket_path }}"
         FORMATTED_LAYER_NAME="${{ inputs.layer_name }}-${{ inputs.python_version }}"
         FORMATTED_ZIP="${FORMATTED_LAYER_NAME}.zip"
+        LAYER_NAME_ARN="arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_ACCOUNT_ID }}:layer:${FORMATTED_LAYER_NAME}"
         
         echo "Upload Lambda Layer on S3 🚀"
         aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${FORMATTED_ZIP}
         
         RESPONSE=$(aws lambda publish-layer-version \
-        --layer-name ${FORMATTED_LAYER_NAME} \
+        --layer-name ${LAYER_NAME_ARN} \
         --compatible-runtimes ${RUNTIME} \
         --description "${{ inputs.layer_name }} Layer" \
         --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}${FORMATTED_ZIP})
