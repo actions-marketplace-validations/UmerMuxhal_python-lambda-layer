@@ -61,6 +61,7 @@ runs:
         FORMATTED_ZIP="${FORMATTED_LAYER_NAME}.zip"
         LAYER_NAME_ARN="arn:aws:lambda:${{ inputs.aws_region }}:${{ inputs.aws_account_id }}:layer:${FORMATTED_LAYER_NAME}"
         
+        echo "layer: ${LAYER_NAME_ARN}"
         echo "Upload Lambda Layer on S3 🚀"
         aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${FORMATTED_ZIP}
         
