@@ -54,7 +54,7 @@ runs:
       run: |
         RUNTIME="python${{ inputs.python_version }}"
         VERSION="${{ inputs.python_version }}"
-        NEW_LAYER_NAME="${{ inputs.layer_name }}-${VERSION//./}"
+        NEW_LAYER_NAME="${{ inputs.layer_name }}-$(echo "VERSION" | tr -d '.')"
         ZIP_FILE="${NEW_LAYER_NAME}.zip"
         
         echo "Upload Lambda Layer on S3 🚀"
