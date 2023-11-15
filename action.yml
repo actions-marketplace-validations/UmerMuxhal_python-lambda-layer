@@ -26,9 +26,6 @@ inputs:
   aws_account_id:
     description: An AWS Account ID to grant layer usage permissions to. (Use "*" to share with all accounts)
     default: "*"
-  aws_region:
-    description: AWS Region for layer
-    required: true
 
 runs:
   using: 'composite'
@@ -56,24 +53,22 @@ runs:
       working-directory: ${{ inputs.layer_directory }}
       run: |
         RUNTIME="python${{ inputs.python_version }}"
-        FOLDER_PATH="${{ inputs.bucket_path }}"
-        FORMATTED_LAYER_NAME="${{ inputs.layer_name }}-${{ inputs.python_version }}"
-        FORMATTED_ZIP="${FORMATTED_LAYER_NAME}.zip"
-        LAYER_NAME_ARN="arn:aws:lambda:${{ inputs.aws_region }}:${{ inputs.aws_account_id }}:layer:${FORMATTED_LAYER_NAME}"
+        VERSION="${{ inputs.python_version }}"
+        NEW_LAYER_NAME="${{ inputs.layer_name }}-${VERSION//./}"
+        ZIP_FILE="${NEW_LAYER_NAME}.zip"
         
-        echo "layer: ${LAYER_NAME_ARN}"
         echo "Upload Lambda Layer on S3 🚀"
-        aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${FORMATTED_ZIP}
+        aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${ZIP_FILE}
         
         RESPONSE=$(aws lambda publish-layer-version \
-        --layer-name ${LAYER_NAME_ARN} \
+        --layer-name ${NEW_LAYER_NAME} \
         --compatible-runtimes ${RUNTIME} \
         --description "${{ inputs.layer_name }} Layer" \
-        --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}${FORMATTED_ZIP})
+        --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}${ZIP_FILE})
 
         echo "::set-output name=layer_version::$(echo $RESPONSE | jq -r '.Version')"
         echo "::set-output name=layer_arn::$(echo $RESPONSE | jq -r '.LayerArn')"
-        echo "::set-output name=layer_name::${FORMATTED_LAYER_NAME}"
+        echo "::set-output name=layer_name::${NEW_LAYER_NAME}"
 
     - name: Add Lambda Layer Permission
       shell: bash
