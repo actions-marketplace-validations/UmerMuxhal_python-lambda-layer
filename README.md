@@ -76,14 +76,14 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Publish Lambda layer
-        uses: UmerMuxhal/python-lambda-layer@v0.3
+        uses: UmerMuxhal/python-lambda-layer@v1
         with:
           python_version: 3.7
           layer_name: "my-lambda-layer"
-          layer_directory: "requirement"
+          layer_directory: "requirements_folder"
           bucket_name: "my-s3-bucket"
           bucket_path: "layers/"
-          aws_account_id: "*"
+          aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
 ```
 
 ## Published Layer Name
