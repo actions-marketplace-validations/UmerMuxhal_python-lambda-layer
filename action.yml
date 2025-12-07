@@ -39,15 +39,6 @@ runs:
         python-version: ${{ inputs.python_version }}
         cache: 'pip'
 
-    - name: Upgrade AWS CLI and Install boto3
-      shell: bash
-      run: |
-        pip3 install boto3
-        sudo apt-get remove awscli
-        sudo pip3 install -U awscli
-        source ~/.bashrc
-        aws --version
-
     - name: Install Python Requirements
       shell: bash
       working-directory: ${{ inputs.layer_directory }}
@@ -62,27 +53,27 @@ runs:
       working-directory: ${{ inputs.layer_directory }}
       run: |
         RUNTIME="python${{ inputs.python_version }}"
-        FOLDER_PATH="${{ inputs.bucket_path }}"
-        FORMATTED_LAYER_NAME="${{ inputs.layer_name }}-${{ inputs.python_version }}"
-        FORMATTED_ZIP="${FORMATTED_LAYER_NAME}.zip"
+        VERSION="${{ inputs.python_version }}"
+        NEW_LAYER_NAME="${{ inputs.layer_name }}-$(echo "$VERSION" | tr -d '.')"
+        ZIP_FILE="${NEW_LAYER_NAME}.zip"
         
         echo "Upload Lambda Layer on S3 🚀"
-        aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${FORMATTED_ZIP}
+        aws s3 cp ./lambda_layer.zip s3://${{ inputs.bucket_name }}/${{ inputs.bucket_path }}${ZIP_FILE}
         
         RESPONSE=$(aws lambda publish-layer-version \
-        --layer-name ${FORMATTED_LAYER_NAME} \
+        --layer-name ${NEW_LAYER_NAME} \
         --compatible-runtimes ${RUNTIME} \
         --description "${{ inputs.layer_name }} Layer" \
-        --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}${FORMATTED_ZIP})
+        --content S3Bucket=${{ inputs.bucket_name }},S3Key=${{ inputs.bucket_path }}${ZIP_FILE})
 
         echo "::set-output name=layer_version::$(echo $RESPONSE | jq -r '.Version')"
         echo "::set-output name=layer_arn::$(echo $RESPONSE | jq -r '.LayerArn')"
-        echo "::set-output name=layer_name::${FORMATTED_LAYER_NAME}"
+        echo "::set-output name=layer_name::${NEW_LAYER_NAME}"
 
     - name: Add Lambda Layer Permission
       shell: bash
       run: |
-        aws lambda add-layer-version-permission --layer_name ${{ steps.publish-layer.outputs.layer_name }} \
+        aws lambda add-layer-version-permission --layer-name ${{ steps.publish-layer.outputs.layer_name }} \
         --version-number ${{ steps.publish-layer.outputs.layer_version }} \
         --principal ${{ inputs.aws_account_id }} \
         --statement-id "GrantAccountAccess-${RANDOM}" \
